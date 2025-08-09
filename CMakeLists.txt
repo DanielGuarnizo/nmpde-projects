@@ -39,7 +39,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-conversion -Wmissing-braces -Wno
 include_directories(include)
 
 # Create a static library for the common sources
-add_library(common_lib STATIC src/common/FiberFields.cpp src/common/NDConfig.cpp src/common/SeedingRegions.cpp)
+add_library(common_lib STATIC 
+  src/common/FiberFields.cpp 
+  src/common/NDConfig.cpp 
+  src/common/SeedingRegions.cpp
+  src/NDThetasolver.cpp
+  )
 deal_ii_setup_target(common_lib)
 
 # Define the neuro_disease_1D executable

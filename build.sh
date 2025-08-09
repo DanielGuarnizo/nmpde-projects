@@ -14,4 +14,5 @@ cmake --build .
 
 # Run executables
 # ./neuro_disease_3D
+# ./neuro_disease_2D
 ./neuro_disease_1D
