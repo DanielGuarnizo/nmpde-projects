@@ -61,3 +61,7 @@ deal_ii_setup_target(neuro_disease_2D)
 add_executable(neuro_disease_3D src/NDAnalysis3D.cpp)
 target_link_libraries(neuro_disease_3D common_lib)
 deal_ii_setup_target(neuro_disease_3D)
+
+# Add the mesh generator executable
+add_executable(mesh_1D_generator src/generate_1D_mesh.cpp)
+deal_ii_setup_target(mesh_1D_generator)

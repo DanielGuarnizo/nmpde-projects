@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <iostream>
-
 #include <deal.II/base/conditional_ostream.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/tensor_function.h>
@@ -42,13 +41,15 @@ class NDThetaSolver
 public:
   // Constructor. We provide the final time, time step Delta t and theta method
   // parameter as constructor arguments.
-    NDThetaSolver(NDProblem<DIM> &problem_,
-                  double theta_,
-                  double deltat_,
-                  double T_,
-                  unsigned int &r_,
-                  const std::string &output_directory_ = "./",
-                  const std::string &output_filename_ = "output")
+    NDThetaSolver(
+      NDProblem<DIM> &problem_,
+      double theta_,
+      double deltat_,
+      double T_,
+      unsigned int &r_,
+      const std::string &output_directory_ = "./",
+      const std::string &output_filename_ = "output"
+    )
     :
       problem(problem_)
     , diffusion_tensor(problem_.get_diffusion_tensor())
@@ -197,12 +198,14 @@ template<unsigned int DIM>
 class NDBackwardEulerSolver : public NDThetaSolver<DIM>
 {
   public:
-    NDBackwardEulerSolver(NDProblem<DIM> &problem_,
-                          double deltat_,
-                          double T_,
-                          unsigned int &r_,
-                          const std::string &output_directory_ = "./",
-                          const std::string &output_filename_ = "output")
+    NDBackwardEulerSolver(
+      NDProblem<DIM> &problem_,
+      double deltat_,
+      double T_,
+      unsigned int &r_,
+      const std::string &output_directory_ = "./",
+      const std::string &output_filename_ = "output"
+    )
       : NDThetaSolver<DIM>(problem_, 1.0, deltat_, T_, r_, output_directory_, output_filename_)
     {}
 

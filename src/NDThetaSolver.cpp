@@ -8,13 +8,17 @@ NDThetaSolver<DIM>::assemble_system()
   const unsigned int dofs_per_cell = this->fe->dofs_per_cell;
   const unsigned int n_q           = this->quadrature->size();
 
-  FEValues<DIM> fe_values(*(this->fe),
-                          *(this->quadrature),
-                          update_values | update_gradients |
-                            update_quadrature_points | update_JxW_values);
+  FEValues<DIM> fe_values(
+    *(this->fe),
+    *(this->quadrature),
+    update_values | 
+    update_gradients |
+    update_quadrature_points | 
+    update_JxW_values
+  );
 
   FullMatrix<double> cell_matrix(dofs_per_cell, dofs_per_cell);
-  Vector<double>     cell_residual(dofs_per_cell);
+  Vector<double> cell_residual(dofs_per_cell);
 
   std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
 
@@ -22,7 +26,7 @@ NDThetaSolver<DIM>::assemble_system()
   this->residual_vector = 0.0;
 
   // Value and gradient of the solution on current cell.
-  std::vector<double>         solution_loc(n_q);
+  std::vector<double> solution_loc(n_q);
   std::vector<double> solution_old_loc(n_q);
 
   std::vector<Tensor<1, DIM>> solution_gradient_loc(n_q);
@@ -85,7 +89,6 @@ NDThetaSolver<DIM>::assemble_system()
 
                   // Non-linear stiffness matrix, second term.
                   // alpha * (1-2*c) * phi_i * phi_j * dx
-
                   cell_matrix(i, j) -=
                     theta * alpha * (1-2.0 * theta_comb) * fe_values.shape_value(j, q) *
                     fe_values.shape_value(i, q) * fe_values.JxW(q);
@@ -96,9 +99,11 @@ NDThetaSolver<DIM>::assemble_system()
 
               // Time derivative term.
               // phi_i * (c - c_old)/deltat * dx
-              cell_residual(i) -= (solution_loc[q] - solution_old_loc[q]) /
-                                  this->deltat * fe_values.shape_value(i, q) *
-                                  fe_values.JxW(q);
+              cell_residual(i) -= 
+                (solution_loc[q] - solution_old_loc[q]) /
+                this->deltat * 
+                fe_values.shape_value(i, q) *
+                fe_values.JxW(q);
 
               // Diffusion term.
               //(1-theta) * D*grad(c_old) * grad(phi_i) * dx
@@ -106,7 +111,7 @@ NDThetaSolver<DIM>::assemble_system()
                   solution_old_gradient_loc[q] * fe_values.shape_grad(i, q) * fe_values.JxW(q);
 
               // Diffusion term.
-              //(1-theta) * D*grad(c_old) * grad(phi_i) * dx
+              //(theta) * D*grad(c_old) * grad(phi_i) * dx
               cell_residual(i) -= theta * diffusion_coefficent_loc[q] *
                   solution_gradient_loc[q] * fe_values.shape_grad(i, q) * fe_values.JxW(q);
 
@@ -474,6 +479,7 @@ NDThetaSolver<DIM>::solve()
 
     pcout << "===============================================" << std::endl;
 }
+
 
 // --- EXPLICIT INSTANTIATION ---
 // This tells the compiler to generate the code for DIM=1, 2, and 3.

@@ -8,19 +8,6 @@
 static const Point<3> brain_origin = Point<3>(80.0, 78.0, 70.0);
 static const Point<3> cube_origin = Point<3>(0.5, 0.5, 0.5);
 
-static NDConfig config_cube = {
-    .dim = 3,
-    .T = 20.0,
-    .alpha = 0.45,
-    .deltat = 0.2,
-    .degree = 1,
-    .d_ext = 0.0,
-    .d_axn = 20.0,
-    .C_0 = 0.4,
-    .mesh = "../meshes/mesh-cube-40.msh",
-    .fiber_field_type = FiberFieldType::AxonBased
-};
-
 static NDConfig config_brain_baseline = {
     .dim = 3,
     .T = 48.0,

@@ -10,20 +10,6 @@ static const Point<2> square_origin = Point<2>(0.5, 0.5);
 
 static const Point<2> sagittal_origin = Point<2>(70.0, 73.0);
 
-static NDConfig config_square = {
-    .dim = 2,
-    .T = 7.0,
-    .alpha = 1.8,
-    // .alpha = 0.0,
-    .deltat = 0.01,
-    .degree = 1,
-    .d_ext = 0.00,
-    .d_axn = 0.2,
-    .C_0 = 0.9,
-    .mesh = "../meshes/mesh-square-300.msh",
-    //.mesh = "../meshes/slice_generated.msh",
-};
-
 static NDConfig config_sagittal = {
     .dim = 2,
     .T = 48.0,

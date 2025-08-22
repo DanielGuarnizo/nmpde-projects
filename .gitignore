@@ -37,6 +37,11 @@ build/*
 build_debug/*
 .vscode/*
 
+experiment_1d_results/*
+
+single_test_output/*
+
+
 *.DS_Store
 run-with-dealii.sh
 .env
