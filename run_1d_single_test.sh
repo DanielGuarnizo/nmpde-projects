@@ -11,7 +11,8 @@ module load gcc-glibc dealii
 
 # --- Define paths and parameters ---
 EXECUTABLE="./build/neuro_disease_1D"
-MESH_FILE="meshes/mesh-40.msh" # Using the original [0, 1] mesh
+# MESH_FILE="meshes/mesh-40.msh" # Using the original [0, 1] mesh
+MESH_FILE="meshes/mesh-1D-centered.msh" # [-1,1]
 
 # These are your original parameters from the static config
 TOTAL_TIME=20.0

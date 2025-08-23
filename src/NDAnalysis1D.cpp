@@ -50,6 +50,7 @@
 //   return EXIT_SUCCESS;
 // }
 
+
 #include "NDProblem.hpp"
 #include "InitialConditions.hpp"
 #include "FiberFields.hpp"
@@ -69,9 +70,9 @@ int main(int argc, char *argv[])
   // It uses the mesh path provided via the command line to center itself.
   // CenteredExponentialInitialCondition<1> initial_condition(config.mesh);
   // in main()
-  // CenteredExponentialInitialCondition<1> initial_condition(config.mesh, config.C_0);
 
-  ExponentialInitialCondition<1> initial_condition;
+  CenteredExponentialInitialCondition<1> initial_condition(config.mesh, config.C_0);
+  // ExponentialInitialCondition<1> initial_condition;
 
   // The fiber field for a 1D problem is simple
   RadialFiberField<1> fiber_field;

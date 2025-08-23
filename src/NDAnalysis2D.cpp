@@ -52,10 +52,11 @@ int main(int argc, char *argv[])
   );
 
   NDProblem<2> problem(config.mesh, config.alpha, config.d_ext, config.d_axn, initial_condition, *fiber_field, config.gray_matter_distance_threshold);
+  problem.export_problem(config.output_dir + config.output_filename + ".problem");
+
+  // Create the numerical solver
   NDBackwardEulerSolver<2> solver(problem, config.deltat, config.T, config.degree, config.output_dir, config.output_filename);
   //NDCrankNicolsonSolver<2> solver(problem, config.deltat, config.T, config.degree, config.output_dir, config.output_filename);
-
-  problem.export_problem(config.output_dir + config.output_filename + ".problem");
   solver.setup();
   solver.solve();
 
