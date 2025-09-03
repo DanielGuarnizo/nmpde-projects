@@ -15,7 +15,7 @@ EXECUTABLE="${PROJECT_ROOT_DIR}/build/neuro_disease_2D"
 # --- THE FIX: Use the correct mesh file you have specified ---
 MESH_FILE="${PROJECT_ROOT_DIR}/meshes/new_slice_generated.msh" 
 
-VISUALIZATION_SCRIPT="${PROJECT_ROOT_DIR}/scripts/2D/figure_9/visualize_2d_single_case_figure_9.py"
+VISUALIZATION_SCRIPT="${PROJECT_ROOT_DIR}/scripts/2D/visualize_2d_single_case.py"
 
 TOTAL_TIME=48.0; TIME_STEP=0.24; POLY_DEGREE=1; C_0_VALUE=0.2
 GRAY_MATTER_THRESH=4.0; DIMENSION=2
