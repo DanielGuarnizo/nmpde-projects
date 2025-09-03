@@ -23,6 +23,25 @@ enum class SeedingRegionType
   TDP43 = 3
 };
 
+// template <unsigned int DIM>
+// class SeedingRegion : public NDProblem<DIM>::InitialConcentration
+// {
+// public:
+//   using CornerPair = std::pair<Point<DIM>, Point<DIM>>;
+
+//   double value(const Point<DIM> &p, const unsigned int component = 0) const override;
+
+//   static SeedingRegion<DIM> create(SeedingRegionType type, double C_0);
+// protected:
+//   SeedingRegion(double C_0, const std::vector<CornerPair> &corners);
+
+// private:
+//   const double _C_0;
+//   Triangulation<DIM> _region;
+
+//   bool is_inside(const Point<DIM> &p) const;
+// };
+
 template <unsigned int DIM>
 class SeedingRegion : public NDProblem<DIM>::InitialConcentration
 {
@@ -31,16 +50,15 @@ public:
 
   double value(const Point<DIM> &p, const unsigned int component = 0) const override;
 
-  static SeedingRegion<DIM> create(SeedingRegionType type, double C_0);
+  // --- CHANGE 1: Return a smart pointer ---
+  static std::unique_ptr<SeedingRegion<DIM>> create(SeedingRegionType type, double C_0);
 
-protected:
+  // --- CHANGE 2: Move the constructor to public ---
   SeedingRegion(double C_0, const std::vector<CornerPair> &corners);
 
 private:
   const double _C_0;
   Triangulation<DIM> _region;
-
   bool is_inside(const Point<DIM> &p) const;
 };
-
 #endif // SEEDING_REGIONS_HPP

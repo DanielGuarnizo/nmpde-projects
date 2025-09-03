@@ -119,49 +119,7 @@ class QuadraticInitialCondition: public NDProblem<DIM>::InitialConcentration
         double ray_squared;
 };
 
-// NEW CLASS: An initial condition that automatically finds the center of the mesh.
-// template <int DIM>
-// class CenteredExponentialInitialCondition : public NDProblem<DIM>::InitialConcentration
-// {
-//     public:
-//     CenteredExponentialInitialCondition(const std::string &mesh_file_path)
-//     {
-//         Triangulation<DIM> temp_tria;
-//         GridIn<DIM> grid_in;
-//         grid_in.attach_triangulation(temp_tria);
-//         std::ifstream in_file(mesh_file_path);
 
-//         if (!in_file)
-//         {
-//             throw std::runtime_error("Could not open mesh file: " + mesh_file_path +
-//                                     " to determine domain center.");
-//         }
-//         grid_in.read_msh(in_file);
-
-//         // --- FIX #1 ---
-//         // Changed get_bounding_box to compute_bounding_box
-//         const auto bounding_box = GridTools::compute_bounding_box(temp_tria);
-//         center = bounding_box.center();
-
-//         std::cout << "Initial condition will be centered at x = " << center[0] << std::endl;
-//     }
-
-//     virtual double value(const Point<DIM> &p,
-//                         const unsigned int /*component*/) const override
-//     {
-//         const double C0 = 0.1;
-//         const double sigma = 0.05;
-
-//         // --- FIX #2 ---
-//         // Changed distance_squared to distance_square
-//         const double distance_squared = center.distance_square(p);
-
-//         return C0 * std::exp(-distance_squared / (2.0 * sigma * sigma));
-//     }
-
-//     private:
-//     Point<DIM> center;
-// };
 template <int DIM>
 class CenteredExponentialInitialCondition : public NDProblem<DIM>::InitialConcentration
 {

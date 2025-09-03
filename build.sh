@@ -31,3 +31,4 @@ if [ ! -d ../experiment_1d_results ]; then
 else
     echo "Test already done. Skipping generation."
 fi
+
