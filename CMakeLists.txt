@@ -43,7 +43,7 @@ add_library(common_lib STATIC
   src/common/FiberFields.cpp 
   src/common/NDConfig.cpp 
   src/common/SeedingRegions.cpp
-  src/NDThetasolver.cpp
+  src/common/NDThetasolver.cpp
   )
 deal_ii_setup_target(common_lib)
 

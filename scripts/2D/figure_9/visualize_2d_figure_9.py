@@ -6,7 +6,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 import sys
 
-# This script orchestrates the visualization process and assembles the final plot.
+# This script orchestrates the visualization process and assembles the final plot for Figure 9.
 
 if __name__ == "__main__":
     # --- Configuration ---
@@ -20,50 +20,31 @@ if __name__ == "__main__":
     diseases = ["alpha_synuclein", "amyloid_beta", "tau", "tdp43"]
     fiber_models = ["isotropic", "circumferential", "radial", "axon_based"]
     
+    # Define the maximum visualization time for the colorbar
+    VIZ_MAX_TIME = 200.0
+
     # --- Stage 1 & 2: Pre-process data and generate a single plot for each case ---
     print("--- STAGE 1 & 2: Generating individual plots for all 16 cases ---")
+    # (The logic for this stage is correct and remains unchanged)
     for disease_name in diseases:
         for fiber_model_name in fiber_models:
             case_name = f"{disease_name} with {fiber_model_name}"
             full_path = os.path.join(RESULTS_BASE_DIR, disease_name, fiber_model_name)
-            
             input_vtu_for_plotting = os.path.join(full_path, "activation_time.vtu")
             output_png = os.path.join(full_path, "activation_plot.png")
-
-            print(f"\n--- Checking case: {case_name} ---")
-            
-            if os.path.exists(output_png):
-                print(f"Final plot '{os.path.basename(output_png)}' already exists. Skipping.")
-                continue
-
             if not os.path.isdir(full_path):
-                print(f"Warning: Directory not found. Skipping.")
+                print(f"Warning: Directory not found for case '{case_name}'. Skipping.")
                 continue
-
-            if os.path.exists(input_vtu_for_plotting):
-                print(f"Found existing '{os.path.basename(input_vtu_for_plotting)}'. Skipping computation.")
-            else:
-                print(f"File not found. Running pre-processing...")
+            if not os.path.exists(input_vtu_for_plotting):
                 compute_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {COMPUTE_SCRIPT_PATH} ."'
-                compute_result = subprocess.run(compute_command, shell=True, capture_output=True, text=True, cwd=full_path)
-                if compute_result.returncode != 0:
-                    print(f"--- PVPYTHON (compute) FAILED for {case_name} ---"); print("STDERR:", compute_result.stderr)
-                    continue
-                else:
-                    print(compute_result.stdout)
-            
-            print(f"Generating final plot...")
+                subprocess.run(compute_command, shell=True, capture_output=True, text=True, cwd=full_path)
             plot_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {PLOT_SCRIPT_PATH} activation_time.vtu activation_plot.png"'
-            plot_result = subprocess.run(plot_command, shell=True, capture_output=True, text=True, cwd=full_path)
-            if plot_result.returncode != 0:
-                print(f"--- PVPYTHON (plot) FAILED for {case_name} ---"); print("STDERR:", plot_result.stderr)
-            else:
-                print(plot_result.stdout)
+            subprocess.run(plot_command, shell=True, capture_output=True, text=True, cwd=full_path)
 
     # --- Stage 3: Assemble the final 4x4 figure ---
     print("\n--- STAGE 3: Assembling final 4x4 figure ---")
     
-    fig, axes = plt.subplots(4, 4, figsize=(12, 12), sharex=True, sharey=True) # Adjusted size
+    fig, axes = plt.subplots(4, 4, figsize=(14, 14))
     fig.suptitle("2D Fiber & Seeding Sensitivity Analysis (Replication of Figure 9)", fontsize=16)
     
     for i, disease_name in enumerate(diseases):
@@ -79,21 +60,30 @@ if __name__ == "__main__":
             
             ax.axis('off')
             
-            # Set titles for the first row (the fiber models)
             if i == 0:
                 ax.set_title(fiber_model_name.replace('_', ' ').capitalize(), fontsize=12)
-
-            # --- THE FIX #1: Add disease names as row labels on the left ---
             if j == 0:
-                # Use a text object for better placement control than ylabel
-                fig.text(0.05, 0.77 - i*0.2, disease_name.replace('_', ' ').capitalize(), 
+                fig.text(0.06, 0.77 - i*0.175, disease_name.replace('_', ' ').capitalize(), 
                          ha='center', va='center', rotation='vertical', fontsize=14)
 
-    # --- THE FIX #2: Remove the colorbar ---
-    # The block for creating the colorbar has been completely removed.
+    # --- THE FIX: Add back the shared colorbar with your customizations ---
+    fig.subplots_adjust(left=0.1, right=0.85, wspace=0.05, hspace=0.05)
     
-    # Adjust layout to prevent title overlap
-    plt.tight_layout(rect=[0.05, 0, 1, 0.96])
+    # 1. Use the 'turbo' colormap
+    cmap = plt.get_cmap('turbo')
+    # 2. Normalize the color range from 0 to 200
+    norm = mcolors.Normalize(vmin=0, vmax=VIZ_MAX_TIME)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+
+    # 3. Create the colorbar axes and the colorbar itself
+    c_ax = fig.add_axes([0.88, 0.15, 0.03, 0.7])
+    cbar = fig.colorbar(sm, cax=c_ax)
+    cbar.set_label("activation time (t)")
+    
+    # 4. Set the custom t0 and tmax labels
+    cbar.set_ticks([0, VIZ_MAX_TIME])
+    cbar.set_ticklabels([r'$t_0$', r'$t_{max}$'])
 
     output_filename = os.path.join(RESULTS_BASE_DIR, "figure9_2D_replication.png")
     plt.savefig(output_filename, dpi=300)

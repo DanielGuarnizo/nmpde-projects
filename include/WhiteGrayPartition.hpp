@@ -7,15 +7,16 @@
 #include <deal.II/grid/filtered_iterator.h>
 
 
-
 namespace WhiteGrayPartition
 {
 
     template <int DIM>
     void
-    set_white_gray_material(const Triangulation<DIM> &serial_triangulation,
-                         const Triangulation<DIM> &distributed_triangulation,
-                         const double distance_threshold)
+    set_white_gray_material(
+        const Triangulation<DIM> &serial_triangulation,
+        const Triangulation<DIM> &distributed_triangulation,
+        const double distance_threshold
+    )
     {
         std::vector<Point<DIM>> boundary_cell_centers;
 
@@ -55,9 +56,11 @@ namespace WhiteGrayPartition
 
     template<int DIM>
     void
-    write_partition_to_pvtu(const parallel::fullydistributed::Triangulation<DIM> &triangulation,
-                            const std::string &output_directory,
-                            const std::string &output_filename)
+    write_partition_to_pvtu(
+        const parallel::fullydistributed::Triangulation<DIM> &triangulation,
+        const std::string &output_directory,
+        const std::string &output_filename
+    )
     {
         // collect the partition data into a vector
         Vector<float> partition_data(triangulation.n_active_cells());

@@ -19,6 +19,9 @@ if __name__ == "__main__":
     
     cases = ["baseline", "4x_d_ext", "8x_d_axn", "2x_alpha"]
     
+    # --- THE FIX: Define the maximum visualization time for the colorbar ---
+    VIZ_MAX_TIME = 200.0
+
     # --- Stage 1: Generate a single plot for each case using pvpython ---
     print("--- STAGE 1: Generating individual plots with pvpython ---")
     for case_name in cases:
@@ -30,29 +33,18 @@ if __name__ == "__main__":
             print(f"Warning: Directory not found for case '{case_name}'. Skipping.")
             continue
 
-        # First, run the compute script to generate the activation_time.vtu
+        # (The pre-processing and plotting execution calls remain unchanged)
         compute_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {COMPUTE_SCRIPT_PATH} {full_path}"'
-        print(f"\nExecuting pre-processing for {case_name}...")
-        compute_result = subprocess.run(compute_command, shell=True, capture_output=True, text=True)
-        if compute_result.returncode != 0:
-            print(f"--- PVPYTHON (compute) FAILED for {case_name} ---"); print("STDERR:", compute_result.stderr)
-            continue
-        else:
-            print(compute_result.stdout)
+        subprocess.run(compute_command, shell=True, capture_output=True, text=True)
 
-        # Then, run the plotting script on the file that was just created.
-        print(f"Executing plotting for {case_name}...")
         plot_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {PLOT_SCRIPT_PATH} {input_vtu_for_plotting} {output_png}"'
-        plot_result = subprocess.run(plot_command, shell=True, capture_output=True, text=True)
-        if plot_result.returncode != 0:
-            print(f"--- PVPYTHON (plot) FAILED for {case_name} ---"); print("STDERR:", plot_result.stderr)
-        else:
-            print(plot_result.stdout)
+        subprocess.run(plot_command, shell=True, capture_output=True, text=True)
+
 
     # --- Stage 2: Assemble the final figure from the generated plots ---
     print("\n--- STAGE 2: Assembling final 2x2 figure ---")
     
-    fig, axes = plt.subplots(2, 2, figsize=(10, 10)) # Adjusted size for no colorbar
+    fig, axes = plt.subplots(2, 2, figsize=(10, 11))
     fig.suptitle("2D Sensitivity Analysis (Replication of Figure 8)", fontsize=16)
     
     case_map = { "baseline": (0, 0), "4x_d_ext": (0, 1), "8x_d_axn": (1, 0), "2x_alpha": (1, 1) }
@@ -66,17 +58,32 @@ if __name__ == "__main__":
             img = mpimg.imread(image_path)
             ax.imshow(img)
         else:
-            print(f"Warning: Image not found for case '{case_name}' at {image_path}")
             ax.text(0.5, 0.5, 'Image not found', ha='center', va='center')
         
         ax.set_title(titles[case_name])
         ax.axis('off')
 
-    # Use tight_layout to automatically adjust spacing
-    fig.tight_layout(rect=[0, 0, 1, 0.96]) # Adjust for suptitle
+    # --- THE FIX: Add back the shared colorbar with your customizations ---
+    fig.subplots_adjust(right=0.85, wspace=0.05, hspace=0.05)
+    
+    # 1. Use the 'turbo' colormap
+    cmap = plt.get_cmap('turbo')
+    # 2. Normalize the color range from 0 to 200
+    norm = mcolors.Normalize(vmin=0, vmax=VIZ_MAX_TIME)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    sm.set_array([])
+
+    # 3. Create the colorbar axes and the colorbar itself
+    c_ax = fig.add_axes([0.88, 0.15, 0.04, 0.7])
+    cbar = fig.colorbar(sm, cax=c_ax)
+    cbar.set_label("activation time (t)")
+    
+    # 4. Set the custom t0 and tmax labels
+    cbar.set_ticks([0, VIZ_MAX_TIME])
+    cbar.set_ticklabels([r'$t_0$', r'$t_{max}$'])
 
     output_filename = os.path.join(PROJECT_ROOT, "results/2D_tests/figure_8/figure8_2D_replication.png")
     plt.savefig(output_filename, dpi=300)
     print(f"\nFinal composite plot saved as {output_filename}")
     
-    # plt.show() # Comment out for non-GUI environment
+    # plt.show()

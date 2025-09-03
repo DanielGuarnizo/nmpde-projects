@@ -1,7 +1,8 @@
+Of course. You are absolutely right to want a final, clean `README.md` that reflects the complete, robust, and automated workflow you have built.
+
+Here is the definitive, updated `README.md`. It is clean, accurate, and provides clear instructions for the entire project as it currently stands.
 
 ---
-
-
 
 
 # Neurodegenerative Disease Simulation
@@ -86,39 +87,35 @@ The visualization scripts rely on `pvpython`. The recommended way to install thi
     ```
 *Note: You must activate the Conda environment (`source /opt/miniforge3/bin/activate pv-env`) in every new terminal session before running the visualization scripts.*
 
-
 ---
 
 #### **4.1 Figure 8: Parameter Sensitivity Analysis**
 
-This runs a 2x2 analysis on the `baseline`, `4x d_ext`, `8x d_axn`, and `2x alpha` cases.
+This runs a 2x2 analysis on the `baseline`, `4x d_ext`, `8x d_axn`, and `2x alpha` cases and automatically generates the final plot.
 
-1.  **Run the C++ Simulations:** From the project root, run:
+1.  **Run the Full Workflow:** From the project root, activate your Conda environment and run the main script:
     ```bash
+    source /opt/miniforge3/bin/activate pv-env
     ./scripts/2D/figure_8/ext_axn_alpha_sensitivity_analysis_figure_8.sh
     ```
-    -   **Output Location:** `/results/2D_tests/figure_8/`
-
-
-2.  **Visualize the Results:** From the project root, activate your Conda environment and run:
-    ```bash
-    python3 ./scripts/2D/figure_8/visualize_2d_figure_8.py
-    ```
-    -   **Output:** `figure8_2D_replication.png` saved in the main project directory.
+    -   **What it Does:** This single script runs the 4 C++ simulations and then immediately calls the Python visualization pipeline to produce the final composite image.
+    -   **Output Location:** Raw data is saved in `/results/2D_tests/figure_8/`. The final plot, `figure8_2D_replication.png`, is saved in the main project directory.
 
 ---
 
 #### **4.2 Figure 9: Disease and Fiber Model Analysis**
 
-This runs a full 4x4 analysis on 4 disease types and 4 fiber models.
+This runs a full 4x4 analysis on 4 disease types and 4 fiber models and automatically verifies each run.
 
-1.  **Run the C++ Simulations:** From the project root, run:
+1.  **Run the Full Workflow:** From the project root, activate your Conda environment and run the main script:
     ```bash
+    source /opt/miniforge3/bin/activate pv-env
     ./scripts/2D/figure_9/fiber_seed_sensitivity_analysis_figure_9.sh
     ```
-    -   **Output Location:** `/results/2D_tests/figure_9/`
+    -   **What it Does:** This script runs all 16 C++ simulations. After each one, it automatically runs a verification/visualization step.
+    -   **Output Location:** Raw data and individual plots (`activation_plot.png`) are saved in subfolders inside `/results/2D_tests/figure_9/`.
 
-2.  **Visualize the Results:** From the project root, activate your Conda environment and run:
+2.  **Assemble the Final Figure 9 Plot:** After the main script finishes, you can create the final 4x4 composite image. From the project root, run:
     ```bash
     python3 ./scripts/2D/figure_9/visualize_2d_figure9.py
     ```
@@ -128,22 +125,20 @@ This runs a full 4x4 analysis on 4 disease types and 4 fiber models.
 
 #### **4.3 Running and Visualizing a Single 2D Case**
 
-To debug or analyze a specific experiment without running the full set, use the single-case scripts.
+To debug or analyze a specific experiment, use the single-case scripts. They run both the simulation and the visualization in one command.
 
-1.  **Configure and Run a Single Simulation:**
-    *   Open the script `./scripts/2D/figure_9/run_single_fig9_test.sh` in a text editor.
-    *   In **Step 2**, change the `DISEASE_NAME` and `FIBER_MODEL_NAME` variables to your desired case.
-    *   Save the file and run it from the project root:
+*   **For a Figure 8 Case:**
+    1.  Open `./scripts/2D/figure_8/run_single_fig8_test.sh`.
+    2.  In **Step 2**, set the `CASE_NAME` variable (e.g., to `"8x_d_axn"`).
+    3.  Save and run the script from the project root. It will run the C++ code and then immediately generate the plot.
+        ```bash
+        ./scripts/2D/figure_8/run_single_fig8_test.sh
+        ```
+
+*   **For a Figure 9 Case:**
+    1.  Open `./scripts/2D/figure_9/run_single_fig9_test.sh`.
+    2.  In **Step 2**, set the `DISEASE_NAME` and `FIBER_MODEL_NAME` variables.
+    3.  Save and run the script from the project root.
         ```bash
         ./scripts/2D/figure_9/run_single_fig9_test.sh
         ```
-    -   **Output Location:** A new folder like `/results/2D_tests/single_test_fig9/tau_axon_based/`.
-
-2.  **Visualize the Single Result:**
-    *   Activate your Conda environment.
-    *   Run the single-case visualizer, passing the path to the results folder you just created:
-        ```bash
-        python3 ./scripts/2D/figure_9/visualize_2d_single_case_figure_9.py results/2D_tests/single_test_fig9/tau_axon_based/
-        ```
-    -   **Output:** An `activation_plot.png` file will be saved inside that specific results folder.
-

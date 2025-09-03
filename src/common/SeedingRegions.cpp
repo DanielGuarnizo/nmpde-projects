@@ -120,8 +120,9 @@ std::unique_ptr<SeedingRegion<DIM>> SeedingRegion<DIM>::create(SeedingRegionType
         corners.push_back(make_pair(Point<2>(100, 70), Point<2>(140, 100)));
         break;
       case SeedingRegionType::Tau:            // Example: A different box
-        //corners.push_back(make_pair(Point<2>(90, 60), Point<2>(98, 65)));
-        corners.push_back(make_pair(Point<2>(83.0, 42.5), Point<2>(91.0, 47.5)));
+        // corners.push_back(make_pair(Point<2>(90, 60), Point<2>(98, 65)));
+        corners.push_back(make_pair(Point<2>(73, 64), Point<2>(81, 69)));
+        // corners.push_back(make_pair(Point<2>(83.0, 42.5), Point<2>(91.0, 47.5)));
         break;
       case SeedingRegionType::TDP43:          // Example: Yet another box
         corners.push_back(make_pair(Point<2>(80, 42), Point<2>(90, 47)));

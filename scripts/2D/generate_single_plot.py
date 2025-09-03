@@ -1,12 +1,11 @@
-# This script must be run with pvpython.
-# It opens a pre-computed activation_time.vtu file and creates a high-quality plot.
-
 from paraview.simple import *
 import os
 import sys
 
 # --- Configuration ---
 IMAGE_RESOLUTION = [1200, 1000]
+# The TOTAL_TIME of the simulation is needed to set a CONSISTENT color scale
+TOTAL_TIME = 200
 
 # --- Input Validation ---
 if len(sys.argv) < 3:
@@ -25,16 +24,24 @@ reader = OpenDataFile(vtu_file_path)
 # --- 2. Visualization Pipeline ---
 view = CreateView('RenderView')
 view.ViewSize = IMAGE_RESOLUTION
-view.Background = [0.32, 0.34, 0.43]
+view.Background = [0.32, 0.34, 0.43] # ParaView's default gray background
+
+# --- THE DEFINITIVE FIX: Hide all extra annotations ---
+view.OrientationAxesVisibility = 0 # Hide the little XYZ axes
 
 display = Show(reader, view)
 ColorBy(display, ('POINTS', 'activationTime'))
 lut = GetColorTransferFunction('activationTime')
 lut.ApplyPreset('Turbo', True)
 
-# --- THE DEFINITIVE FIX: Call the function with no arguments ---
-# This automatically rescales to the actual data range of the 'activationTime' array.
-lut.RescaleTransferFunctionToDataRange()
+# --- THE DEFINITIVE FIX: Set a CONSISTENT data range for all plots ---
+# This ensures that a specific color means the same time in every image.
+lut.RescaleTransferFunction(0, TOTAL_TIME)
+
+# This command gets a reference to the color bar
+scalar_bar = GetScalarBar(lut, view)
+# --- THE DEFINITIVE FIX: Make the color bar invisible ---
+scalar_bar.Visibility = 0
 
 # Set final representation properties for a clean look
 display.Representation = 'Surface'
@@ -42,13 +49,9 @@ display.ColorArrayName = ['POINTS', 'activationTime']
 display.LookupTable = lut
 display.Interpolation = 'Gouraud' 
 
-scalar_bar = GetScalarBar(lut, view)
-scalar_bar.Title = "activation time"
-scalar_bar.ComponentTitle = ''
-
 # --- 3. Frame the Shot and Save ---
 ResetCamera()
-view.CameraParallelScale *= 0.9
+view.CameraParallelScale *= 0.9 # Zoom in slightly
 
 SaveScreenshot(output_png_path, view, ImageResolution=IMAGE_RESOLUTION)
 print(f"Successfully saved final plot to {output_png_path}")

@@ -7,8 +7,8 @@ import sys
 if __name__ == "__main__":
     # --- Input Validation ---
     if len(sys.argv) < 2:
-        print("Usage: python3 ./scripts/2D/figure_9/visualize_2d_single_case_figure_9.py <path_to_result_directory>")
-        print("Example: python3 ./scripts/2D/figure_9/visualize_2d_single_case_figure_9.py results/2D_tests/single_test_fig9/alpha_synuclein_axon_based")
+        print("Usage: python3 ./scripts/2D/visualize_2d_single_case.py <path_to_result_directory>")
+        print("Example: python3 ./scripts/2D/visualize_2d_single_case.py results/2D_tests/single_test_fig9/alpha_synuclein_axon_based")
         sys.exit(1)
         
     # --- THE FIX: The command-line argument is the full path to the results ---
