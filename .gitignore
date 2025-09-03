@@ -27,19 +27,17 @@ build/
 ## OS Specific Files #########################################################
 *.DS_Store
 
-## Results Directory Management ##############################################
+
+## Python Cache ##############################################################
+__pycache__/
+*.pyc
+
+## Simulation Data Files #####################################################
 #
-# This is the core logic:
-# 1. Ignore the entire contents of the results directory by default.
-#    This will ignore all the heavy .vtu, .pvtu, .problem, etc. files.
-results/
+# This is the definitive fix:
+# Ignore all .vtu and .pvtu files everywhere in the project.
+*.vtu
+*.pvtu
+# Also ignore the .problem text files.
+*.problem
 
-# 2. BUT, do NOT ignore the final .png image files inside any subdirectory.
-#    The '!' negates the previous ignore rule for this specific pattern.
-#    The '**/' is a special glob that matches all subdirectories recursively.
-!results/**/*.png
-
-# 3. (Optional but good practice) Also, do not ignore .gitkeep files.
-#    This allows you to commit an empty directory structure if you need to,
-#    by placing an empty file named ".gitkeep" inside a folder.
-!results/**/.gitkeep
