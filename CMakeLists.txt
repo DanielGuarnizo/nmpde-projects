@@ -39,7 +39,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-conversion -Wmissing-braces -Wno
 include_directories(include)
 
 # Create a static library for the common sources
-add_library(common_lib STATIC src/common/FiberFields.cpp src/common/NDConfig.cpp src/common/SeedingRegions.cpp)
+add_library(common_lib STATIC 
+  src/common/FiberFields.cpp 
+  src/common/NDConfig.cpp 
+  src/common/SeedingRegions.cpp
+  src/NDThetasolver.cpp
+  )
 deal_ii_setup_target(common_lib)
 
 # Define the neuro_disease_1D executable
@@ -56,3 +61,11 @@ deal_ii_setup_target(neuro_disease_2D)
 add_executable(neuro_disease_3D src/NDAnalysis3D.cpp)
 target_link_libraries(neuro_disease_3D common_lib)
 deal_ii_setup_target(neuro_disease_3D)
+
+# Add the mesh generator executable
+add_executable(mesh_1D_generator src/generate_1D_mesh.cpp)
+deal_ii_setup_target(mesh_1D_generator)
+
+# Add the C++ boundary extractor executable
+add_executable(boundary_extractor src/extract_boundary_to_obj.cpp)
+deal_ii_setup_target(boundary_extractor)

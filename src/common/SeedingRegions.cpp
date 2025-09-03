@@ -67,10 +67,17 @@ bool SeedingRegion<DIM>::is_inside(const Point<DIM> &p) const
 }
 
 template <unsigned int DIM>
-SeedingRegion<DIM> SeedingRegion<DIM>::create(SeedingRegionType type, double C_0)
+// SeedingRegion<DIM> SeedingRegion<DIM>::create(SeedingRegionType type, double C_0)
+// {
+//   using std::make_pair;
+//   // Typedef for clarity
+//   using RegionCornerPair = typename SeedingRegion<DIM>::CornerPair;
+//   std::vector<RegionCornerPair> corners;
+
+// --- CHANGE 1: Update the function signature to match the header ---
+std::unique_ptr<SeedingRegion<DIM>> SeedingRegion<DIM>::create(SeedingRegionType type, double C_0)
 {
   using std::make_pair;
-  // Typedef for clarity
   using RegionCornerPair = typename SeedingRegion<DIM>::CornerPair;
   std::vector<RegionCornerPair> corners;
 
@@ -113,7 +120,8 @@ SeedingRegion<DIM> SeedingRegion<DIM>::create(SeedingRegionType type, double C_0
         corners.push_back(make_pair(Point<2>(100, 70), Point<2>(140, 100)));
         break;
       case SeedingRegionType::Tau:            // Example: A different box
-        corners.push_back(make_pair(Point<2>(90, 60), Point<2>(98, 65)));
+        //corners.push_back(make_pair(Point<2>(90, 60), Point<2>(98, 65)));
+        corners.push_back(make_pair(Point<2>(83.0, 42.5), Point<2>(91.0, 47.5)));
         break;
       case SeedingRegionType::TDP43:          // Example: Yet another box
         corners.push_back(make_pair(Point<2>(80, 42), Point<2>(90, 47)));
@@ -128,7 +136,9 @@ SeedingRegion<DIM> SeedingRegion<DIM>::create(SeedingRegionType type, double C_0
     // Or handle other dimensions if necessary, or throw.
     static_assert(DIM == 2 || DIM == 3, "SeedingRegion::create is only implemented for DIM 2 or 3.");
   }
-  return SeedingRegion<DIM>(C_0, corners);
+  // return SeedingRegion<DIM>(C_0, corners);
+  // --- CHANGE 2: Return a smart pointer instead of an object ---
+  return std::make_unique<SeedingRegion<DIM>>(C_0, corners);
 }
 
 // Explicit instantiations for DIM = 2 and DIM = 3
