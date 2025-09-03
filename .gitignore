@@ -31,16 +31,11 @@ build/
 __pycache__/
 *.pyc
 
-## Results Directory Management ##############################################
+## Simulation Data Files #####################################################
 #
-# This is the definitive, simplified logic:
-# 1. Ignore the entire contents of the results directory by default.
-#    This will ignore all heavy data files like .vtu, .pvtu, .problem, etc.
-results/*
-
-# 2. BUT, do NOT ignore the results directory itself, so we can look inside it.
-!results/
-
-# 3. And do NOT ignore any file ending in .png anywhere inside the results directory.
-#    The '**/' matches all subdirectories recursively.
-!results/**/*.png
+# This is the definitive fix:
+# Ignore all .vtu and .pvtu files everywhere in the project.
+*.vtu
+*.pvtu
+# Also ignore the .problem text files.
+*.problem
