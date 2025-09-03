@@ -1,6 +1,9 @@
 
 ---
 
+
+
+
 # Neurodegenerative Disease Simulation
 
 This project provides a C++ implementation of the reaction-diffusion model for neurodegenerative diseases presented in Weickenmeier et al. (2019), "A physics-based model explains the prion-like features of neurodegeneration...".
@@ -83,6 +86,7 @@ The visualization scripts rely on `pvpython`. The recommended way to install thi
     ```
 *Note: You must activate the Conda environment (`source /opt/miniforge3/bin/activate pv-env`) in every new terminal session before running the visualization scripts.*
 
+
 ---
 
 #### **4.1 Figure 8: Parameter Sensitivity Analysis**
@@ -94,6 +98,7 @@ This runs a 2x2 analysis on the `baseline`, `4x d_ext`, `8x d_axn`, and `2x alph
     ./scripts/2D/figure_8/ext_axn_alpha_sensitivity_analysis_figure_8.sh
     ```
     -   **Output Location:** `/results/2D_tests/figure_8/`
+
 
 2.  **Visualize the Results:** From the project root, activate your Conda environment and run:
     ```bash

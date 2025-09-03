@@ -27,7 +27,6 @@ build/
 ## OS Specific Files #########################################################
 *.DS_Store
 
-
 ## Python Cache ##############################################################
 __pycache__/
 *.pyc
@@ -40,4 +39,3 @@ __pycache__/
 *.pvtu
 # Also ignore the .problem text files.
 *.problem
-
