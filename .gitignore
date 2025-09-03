@@ -27,19 +27,20 @@ build/
 ## OS Specific Files #########################################################
 *.DS_Store
 
+## Python Cache ##############################################################
+__pycache__/
+*.pyc
+
 ## Results Directory Management ##############################################
 #
-# This is the core logic:
+# This is the definitive, simplified logic:
 # 1. Ignore the entire contents of the results directory by default.
-#    This will ignore all the heavy .vtu, .pvtu, .problem, etc. files.
-results/
+#    This will ignore all heavy data files like .vtu, .pvtu, .problem, etc.
+results/*
 
-# 2. BUT, do NOT ignore the final .png image files inside any subdirectory.
-#    The '!' negates the previous ignore rule for this specific pattern.
-#    The '**/' is a special glob that matches all subdirectories recursively.
+# 2. BUT, do NOT ignore the results directory itself, so we can look inside it.
+!results/
+
+# 3. And do NOT ignore any file ending in .png anywhere inside the results directory.
+#    The '**/' matches all subdirectories recursively.
 !results/**/*.png
-
-# 3. (Optional but good practice) Also, do not ignore .gitkeep files.
-#    This allows you to commit an empty directory structure if you need to,
-#    by placing an empty file named ".gitkeep" inside a folder.
-!results/**/.gitkeep
