@@ -2,7 +2,8 @@ import subprocess
 import os
 
 # --- Configuration ---
-GMSH_EXE_PATH = "gmsh"  # Or provide the full path if not in PATH, e.g., "/usr/local/bin/gmsh"
+# GMSH_EXE_PATH = "gmsh"  # Or provide the full path if not in PATH, e.g., "/usr/local/bin/gmsh"
+GMSH_EXE_PATH = "/Applications/Gmsh.app/Contents/MacOS/gmsh"
 DEFAULT_LC_GLOBAL = 1.0  # Default characteristic length for Gmsh if not calculable
 LC_RATIO_BOUNDARY = 0.03 # Target mesh size as a ratio of the characteristic length of the domain for outer boundary
 LC_RATIO_HOLE = 0.015    # Finer mesh for holes

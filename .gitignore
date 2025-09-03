@@ -1,51 +1,45 @@
-## C++ #########################################################################
-
-# Prerequisites
+## C++ Compilation Artifacts #################################################
 *.d
-
-# Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
-
-# Precompiled Headers
 *.gch
 *.pch
-
-# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
 *.mod
 *.smod
-
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
-
-# Executables
 *.exe
 *.out
 *.app
 
-build/*
-build_debug/*
-.vscode/*
-
-experiment_1d_results/*
-
-single_test_output/*
-
-
-*.DS_Store
-run-with-dealii.sh
+## Build & Environment Directories ###########################################
+build/
+.vscode/
 .env
 
-*vtu
-*.pvd
-*msh
+## OS Specific Files #########################################################
+*.DS_Store
+
+## Results Directory Management ##############################################
+#
+# This is the core logic:
+# 1. Ignore the entire contents of the results directory by default.
+#    This will ignore all the heavy .vtu, .pvtu, .problem, etc. files.
+results/
+
+# 2. BUT, do NOT ignore the final .png image files inside any subdirectory.
+#    The '!' negates the previous ignore rule for this specific pattern.
+#    The '**/' is a special glob that matches all subdirectories recursively.
+!results/**/*.png
+
+# 3. (Optional but good practice) Also, do not ignore .gitkeep files.
+#    This allows you to commit an empty directory structure if you need to,
+#    by placing an empty file named ".gitkeep" inside a folder.
+!results/**/.gitkeep

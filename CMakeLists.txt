@@ -65,3 +65,7 @@ deal_ii_setup_target(neuro_disease_3D)
 # Add the mesh generator executable
 add_executable(mesh_1D_generator src/generate_1D_mesh.cpp)
 deal_ii_setup_target(mesh_1D_generator)
+
+# Add the C++ boundary extractor executable
+add_executable(boundary_extractor src/extract_boundary_to_obj.cpp)
+deal_ii_setup_target(boundary_extractor)
