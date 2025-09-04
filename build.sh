@@ -24,11 +24,4 @@ else
     echo "Mesh file already exists. Skipping generation."
 fi
 
-# Run experiments 
-if [ ! -d ../experiment_1d_results ]; then
-    cd ..
-    ./run_1d_experiment.sh
-else
-    echo "Test already done. Skipping generation."
-fi
 

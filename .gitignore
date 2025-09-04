@@ -37,5 +37,6 @@ __pycache__/
 # Ignore all .vtu and .pvtu files everywhere in the project.
 *.vtu
 *.pvtu
+*.log
 # Also ignore the .problem text files.
 *.problem

@@ -26,6 +26,8 @@ struct NDConfig
   FiberFieldType fiber_field_type;
   double gray_matter_distance_threshold = 0.0; // all white matter by default
 
+  std::string preconditioner_type = "none";
+
   void parse(int argc, char *argv[]);
 };
 

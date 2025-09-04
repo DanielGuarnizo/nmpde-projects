@@ -112,3 +112,8 @@ double CircumferentialFiberField<3>::value(const Point<3> &p, const unsigned int
         return val2_unnormalized / normalizer;
     }
 }
+
+
+
+
+

@@ -142,3 +142,7 @@ To debug or analyze a specific experiment, use the single-case scripts. They run
         ```bash
         ./scripts/2D/figure_9/run_single_fig9_test.sh
         ```
+
+### Environment 
+run the following command to be able to see the execution time in the preconditioner test 
+apt-get update && apt-get install -y bc
