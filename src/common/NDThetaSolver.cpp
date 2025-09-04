@@ -443,8 +443,11 @@ NDThetaSolver<DIM>::solve()
   {
     pcout << "Applying the initial condition" << std::endl;
 
-    VectorTools::interpolate(dof_handler, problem.get_initial_concentration(),
-                             solution_owned);
+    VectorTools::interpolate(
+      dof_handler, 
+      problem.get_initial_concentration(),
+      solution_owned
+    );
     solution = solution_owned;
 
     // Output the initial solution.
@@ -462,8 +465,7 @@ NDThetaSolver<DIM>::solve()
       // Store the old solution (previous time-step), so that it is available for assembly.
       solution_old = solution;
 
-      pcout << "n = " << std::setw(3) << time_step << ", t = " << std::setw(5)
-            << std::fixed << time << std::endl;
+      pcout << "n = " << std::setw(3) << time_step << ", t = " << std::setw(5) << std::fixed << time << std::endl;
 
       // At every time step, we invoke Newton's method to solve the non-linear
       // problem.
