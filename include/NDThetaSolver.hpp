@@ -29,6 +29,12 @@
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/lac/solver_minres.h>
 
+// ADD INCLUDES FOR THE NEW PRECONDITIONERS
+#include <deal.II/lac/trilinos_precondition.h> // Base for SSOR, Jacobi, ILU
+// #include <deal.II/lac/trilinos_precondition_amg.h> // For AMG
+
+#include <deal.II/lac/precondition.h> // <-- ADD THIS LINE
+
 #include "NDProblem.hpp"
 #include "WhiteGrayPartition.hpp"
 
@@ -42,27 +48,32 @@ public:
   // Constructor. We provide the final time, time step Delta t and theta method
   // parameter as constructor arguments.
     NDThetaSolver(
-      NDProblem<DIM> &problem_,
-      double theta_,
-      double deltat_,
-      double T_,
-      unsigned int &r_,
-      const std::string &output_directory_ = "./",
-      const std::string &output_filename_ = "output"
-    )
-    :
-      problem(problem_)
-    , diffusion_tensor(problem_.get_diffusion_tensor())
-    , theta(theta_)
-    , deltat(deltat_)
-    , T(T_)
-    , mpi_size(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD))
-    , mpi_rank(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
-    , pcout(std::cout, mpi_rank == 0)
-    , r(r_)
-    , output_directory(output_directory_)
-    , output_filename(output_filename_)
-    , mesh(MPI_COMM_WORLD)
+    NDProblem<DIM> &problem_,
+    double theta_,
+    double deltat_,
+    double T_,
+    unsigned int &r_,
+    const std::string &output_directory_ = "./",
+    const std::string &output_filename_ = "output",
+    const std::string &preconditioner_type_ = "none"
+  )
+  : // --- Initializer list now matches the declaration order ---
+    problem(problem_)
+  , diffusion_tensor(problem_.get_diffusion_tensor())
+  , theta(theta_)
+  , deltat(deltat_)
+  , T(T_)
+  , mpi_size(Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD))
+  , mpi_rank(Utilities::MPI::this_mpi_process(MPI_COMM_WORLD))
+  , pcout(std::cout, mpi_rank == 0)
+  , r(r_)
+  , output_directory(output_directory_)
+  , output_filename(output_filename_)
+  , preconditioner_type(preconditioner_type_)
+  , total_linear_iterations(0)
+  , n_linear_solves(0)
+  , total_newton_iterations(0)
+  , mesh(MPI_COMM_WORLD)
   {
     if(theta < 0.0 || theta > 1.0)
       throw std::runtime_error("Theta parameter must be in the interval [0, 1].");
@@ -84,10 +95,12 @@ protected:
   virtual void solve_linear_system();
 
   // Solve the problem for one time step using Newton's method.
-  virtual void solve_newton();
+  virtual unsigned int solve_newton();
 
   // Output.
   void output(const unsigned int &time_step) const;
+
+  // --- REORDERED MEMBERS START HERE ---
 
   // Problem references
   const NDProblem<DIM> &problem;
@@ -103,28 +116,23 @@ protected:
   // Final time.
   double T;
 
-  // MPI parallel. /////////////////////////////////////////////////////////////
-
-  // Number of MPI processes.
+  // MPI parallel.
   const unsigned int mpi_size;
-
-  // This MPI process.
   const unsigned int mpi_rank;
-
-  // Parallel output stream.
   ConditionalOStream pcout;
 
   // Polynomial degree.
   const unsigned int r;
 
-  // directory where the output files will be written
+  // Output configuration
   std::string output_directory;
-
-  // output filename
   std::string output_filename;
 
-  // Jacobian matrix.
-  TrilinosWrappers::SparseMatrix jacobian_matrix;
+  // Preconditioner choice and performance tracking.
+  std::string preconditioner_type;
+  unsigned int total_linear_iterations;
+  unsigned int n_linear_solves;
+  unsigned int total_newton_iterations;
 
   // Mesh.
   parallel::fullydistributed::Triangulation<DIM> mesh;
@@ -144,6 +152,9 @@ protected:
 
   // DoFs relevant to the current process (including ghost DoFs).
   IndexSet locally_relevant_dofs;
+
+  // Jacobian matrix.
+  TrilinosWrappers::SparseMatrix jacobian_matrix;
 
   // Residual vector.
   TrilinosWrappers::MPI::Vector residual_vector;
@@ -166,7 +177,8 @@ protected:
   // Total domain volume.
   double total_domain_volume;
 
-  private: 
+  // --- REORDERED MEMBERS END HERE ---
+private: 
 
   // Write the fiber field to the output file.
   void write_fiber_field_to_file() const;
@@ -181,13 +193,16 @@ template<unsigned int DIM>
 class NDCrankNicolsonSolver : public NDThetaSolver<DIM>
 {
   public:
-    NDCrankNicolsonSolver(NDProblem<DIM> &problem_,
-                          double deltat_,
-                          double T_,
-                          unsigned int &r_,
-                          const std::string &output_directory_ = "./",
-                          const std::string &output_filename_ = "output")
-      : NDThetaSolver<DIM>(problem_, 0.5, deltat_, T_, r_, output_directory_, output_filename_)
+    NDCrankNicolsonSolver(
+      NDProblem<DIM> &problem_,
+      double deltat_,
+      double T_,
+      unsigned int &r_,
+      const std::string &output_directory_ = "./",
+      const std::string &output_filename_ = "output",
+      const std::string &preconditioner_type_ = "none"
+    )
+      : NDThetaSolver<DIM>(problem_, 0.5, deltat_, T_, r_, output_directory_, output_filename_, preconditioner_type_)
     {}
 
     virtual ~NDCrankNicolsonSolver() = default;
@@ -204,9 +219,10 @@ class NDBackwardEulerSolver : public NDThetaSolver<DIM>
       double T_,
       unsigned int &r_,
       const std::string &output_directory_ = "./",
-      const std::string &output_filename_ = "output"
+      const std::string &output_filename_ = "output",
+      const std::string &preconditioner_type_ = "none"
     )
-      : NDThetaSolver<DIM>(problem_, 1.0, deltat_, T_, r_, output_directory_, output_filename_)
+      : NDThetaSolver<DIM>(problem_, 1.0, deltat_, T_, r_, output_directory_, output_filename_, preconditioner_type_)
     {}
 
     virtual ~NDBackwardEulerSolver() = default;

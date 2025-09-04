@@ -264,33 +264,84 @@ NDThetaSolver<DIM>::setup()
 
 }
 
+// template<unsigned int DIM>
+// void
+// NDThetaSolver<DIM>::solve_linear_system()
+// {
+//   SolverControl solver_control(20000, 1e-12 * residual_vector.l2_norm());
+ 
+//   //WE DO NOT USE CG AS WE CANNOT GUARANTEE THAT THE JACOBIAN MATRIX IS POSITIVE DEFINITE. IN FACT, WHEN REACTION DOMINATES, THE SYTEM BECOMES NOT POSITIVE DEFINITE.
+//   //SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
+//   //SolverGMRES<TrilinosWrappers::MPI::Vector> solver(solver_control);;
+//   SolverMinRes<TrilinosWrappers::MPI::Vector> solver(solver_control);;
+
+//   TrilinosWrappers::PreconditionSSOR      preconditioner;
+//   preconditioner.initialize(jacobian_matrix, TrilinosWrappers::PreconditionSSOR::AdditionalData(1.0));
+
+// //  TrilinosWrappers::PreconditionILU      preconditioner;
+// //    preconditioner.initialize(jacobian_matrix,
+// //                                 TrilinosWrappers::PreconditionILU::AdditionalData(1.0));
+                 
+// //   TrilinosWrappers::PreconditionAMG preconditioner;
+// //   preconditioner.initialize(jacobian_matrix);
+
+//   solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+//   pcout << "  " << solver_control.last_step() << " MINRES iterations" << std::endl;
+// }
+
 template<unsigned int DIM>
 void
 NDThetaSolver<DIM>::solve_linear_system()
 {
   SolverControl solver_control(20000, 1e-12 * residual_vector.l2_norm());
- 
-  //WE DO NOT USE CG AS WE CANNOT GUARANTEE THAT THE JACOBIAN MATRIX IS POSITIVE DEFINITE. IN FACT, WHEN REACTION DOMINATES, THE SYTEM BECOMES NOT POSITIVE DEFINITE.
-  //SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
-  //SolverGMRES<TrilinosWrappers::MPI::Vector> solver(solver_control);;
-  SolverMinRes<TrilinosWrappers::MPI::Vector> solver(solver_control);;
+  SolverMinRes<TrilinosWrappers::MPI::Vector> solver(solver_control);
 
-  TrilinosWrappers::PreconditionSSOR      preconditioner;
-  preconditioner.initialize(jacobian_matrix, TrilinosWrappers::PreconditionSSOR::AdditionalData(1.0));
+  pcout << "  Using preconditioner: " << preconditioner_type << std::endl;
 
-//  TrilinosWrappers::PreconditionILU      preconditioner;
-//    preconditioner.initialize(jacobian_matrix,
-//                                 TrilinosWrappers::PreconditionILU::AdditionalData(1.0));
-                 
-//   TrilinosWrappers::PreconditionAMG preconditioner;
-//   preconditioner.initialize(jacobian_matrix);
+  if (preconditioner_type == "none")
+  {
+    // No preconditioner
+    solver.solve(jacobian_matrix, delta_owned, residual_vector, PreconditionIdentity());
+  }
+  else if (preconditioner_type == "jacobi")
+  {
+    TrilinosWrappers::PreconditionJacobi preconditioner;
+    preconditioner.initialize(jacobian_matrix);
+    solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+  }
+  else if (preconditioner_type == "ilu")
+  {
+    // NOTE: ILU is for general matrices. Incomplete Cholesky (IC) is only for
+    // symmetric positive-definite ones. Since your problem might not be, ILU is safer.
+    TrilinosWrappers::PreconditionILU preconditioner;
+    preconditioner.initialize(jacobian_matrix, TrilinosWrappers::PreconditionILU::AdditionalData(0));
+    solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+  }
+  else if (preconditioner_type == "amg")
+  {
+    TrilinosWrappers::PreconditionAMG preconditioner;
+    preconditioner.initialize(jacobian_matrix);
+    solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+  }
+  else
+  {
+    pcout << "  WARNING: Unknown preconditioner '" << preconditioner_type
+          << "'. Using default (SSOR)." << std::endl;
+    TrilinosWrappers::PreconditionSSOR preconditioner;
+    preconditioner.initialize(jacobian_matrix, TrilinosWrappers::PreconditionSSOR::AdditionalData(1.0));
+    solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+  }
 
-  solver.solve(jacobian_matrix, delta_owned, residual_vector, preconditioner);
+  // --- Performance Tracking ---
+  total_linear_iterations += solver_control.last_step();
+  n_linear_solves++;
+  // --------------------------
+
   pcout << "  " << solver_control.last_step() << " MINRES iterations" << std::endl;
 }
 
 template<unsigned int DIM>
-void
+unsigned int
 NDThetaSolver<DIM>::solve_newton()
 {
   const unsigned int n_max_iters        = 1000;
@@ -300,32 +351,34 @@ NDThetaSolver<DIM>::solve_newton()
   double       residual_norm = residual_tolerance + 1;
 
   while (n_iter < n_max_iters && residual_norm > residual_tolerance)
-    {
+  {
 
-      assemble_system();
-      residual_norm = residual_vector.l2_norm();
+    assemble_system();
+    residual_norm = residual_vector.l2_norm();
 
-      pcout << "  Newton iteration " << n_iter << "/" << n_max_iters
-            << " - ||r|| = " << std::scientific << std::setprecision(6)
-            << residual_norm << std::flush;
+    pcout << "  Newton iteration " << n_iter << "/" << n_max_iters
+          << " - ||r|| = " << std::scientific << std::setprecision(6)
+          << residual_norm << std::flush;
 
-      // We actually solve the system only if the residual is larger than the
-      // tolerance.
-      if (residual_norm > residual_tolerance)
-        {
-          //At each iteration of Newton's method, we solve the linear system for the increment of the solution.
-          solve_linear_system();
+    // We actually solve the system only if the residual is larger than the
+    // tolerance.
+    if (residual_norm > residual_tolerance)
+      {
+        //At each iteration of Newton's method, we solve the linear system for the increment of the solution.
+        solve_linear_system();
 
-          solution_owned += delta_owned;
-          solution = solution_owned;
-        }
-      else
-        {
-          pcout << " < tolerance" << std::endl;
-        }
+        solution_owned += delta_owned;
+        solution = solution_owned;
+      }
+    else
+      {
+        pcout << " < tolerance" << std::endl;
+      }
 
-      ++n_iter;
-    }
+    ++n_iter;
+  }
+  return n_iter;
+
 }
 
 template<unsigned int DIM>
@@ -458,28 +511,37 @@ NDThetaSolver<DIM>::solve()
   unsigned int time_step = 0;
 
   while (time < T - 0.5 * deltat)
-    {
-      time += deltat;
-      ++time_step;
+  {
+    time += deltat;
+    ++time_step;
 
-      // Store the old solution (previous time-step), so that it is available for assembly.
-      solution_old = solution;
+    // Store the old solution (previous time-step), so that it is available for assembly.
+    solution_old = solution;
+    pcout << "n = " << std::setw(3) << time_step << ", t = " << std::setw(5) << std::fixed << time << std::endl;
 
-      pcout << "n = " << std::setw(3) << time_step << ", t = " << std::setw(5) << std::fixed << time << std::endl;
+    // Capture the number of newton iterations for this time step
+    const unsigned int newton_iters_this_step = solve_newton();
+    total_newton_iterations += newton_iters_this_step;
 
-      // At every time step, we invoke Newton's method to solve the non-linear
-      // problem.
-      solve_newton();
+    // Calculate global concentration by integrating the current solution over the whole domain
+    compute_current_global_concentration();
+    output(time_step);
+    pcout << std::endl;
+  }
 
-      // Calculate global concentration by integrating the current solution over the whole domain
-      compute_current_global_concentration();
-
-      output(time_step);
-
-      pcout << std::endl;
-    }
-
-    pcout << "===============================================" << std::endl;
+  // --- UPDATE THE FINAL SUMMARY PRINTOUT ---
+  pcout << "===============================================" << std::endl;
+  pcout << "Simulation finished." << std::endl;
+  pcout << "PERFORMANCE SUMMARY:" << std::endl;
+  pcout << "  Preconditioner: " << preconditioner_type << std::endl;
+  pcout << "  Total time steps: " << time_step << std::endl;
+  pcout << "  Total Newton iterations: " << total_newton_iterations << std::endl; // <-- ADD THIS
+  pcout << "  Total linear solves: " << n_linear_solves << std::endl;
+  pcout << "  Total linear iterations: " << total_linear_iterations << std::endl;
+  if (n_linear_solves > 0)
+    pcout << "  Average linear iterations per solve: " << std::fixed << std::setprecision(2)
+          << static_cast<double>(total_linear_iterations) / n_linear_solves << std::endl;
+  pcout << "===============================================" << std::endl;
 }
 
 

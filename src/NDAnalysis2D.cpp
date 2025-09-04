@@ -29,7 +29,16 @@ int main(int argc, char *argv[])
   
   problem.export_problem(config.output_dir + config.output_filename + ".problem");
 
-  NDBackwardEulerSolver<2> solver(problem, config.deltat, config.T, config.degree, config.output_dir, config.output_filename);
+  NDBackwardEulerSolver<2> solver(
+    problem, 
+    config.deltat, 
+    config.T, 
+    config.degree, 
+    config.output_dir, 
+    config.output_filename,
+    config.preconditioner_type
+  );
+  
   solver.setup();
   solver.solve();
 
