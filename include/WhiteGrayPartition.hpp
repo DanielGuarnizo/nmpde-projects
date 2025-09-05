@@ -79,6 +79,7 @@ namespace WhiteGrayPartition
         data_out.build_patches();
         data_out.write_vtu_with_pvtu_record(output_directory, output_filename + "_white_gray_partition", 0, MPI_COMM_WORLD, 0);
     }
+    
 
 } // namespace WhiteGrayPartition
 
