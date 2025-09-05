@@ -115,7 +115,7 @@ module load gcc-glibc dealii
 # Choose one disease name and one fiber model name from the options below.
 
 # Options for DISEASE_NAME: "alpha_synuclein", "amyloid_beta", "tau", "tdp43"
-DISEASE_NAME="alpha_synuclein"
+DISEASE_NAME="tdp43"
 
 # Options for FIBER_MODEL_NAME: "isotropic", "radial", "circumferential", "axon_based"
 FIBER_MODEL_NAME="axon_based"

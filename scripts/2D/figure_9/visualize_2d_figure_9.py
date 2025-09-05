@@ -32,14 +32,16 @@ if __name__ == "__main__":
             full_path = os.path.join(RESULTS_BASE_DIR, disease_name, fiber_model_name)
             input_vtu_for_plotting = os.path.join(full_path, "activation_time.vtu")
             output_png = os.path.join(full_path, "activation_plot.png")
+            
             if not os.path.isdir(full_path):
                 print(f"Warning: Directory not found for case '{case_name}'. Skipping.")
                 continue
             if not os.path.exists(input_vtu_for_plotting):
                 compute_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {COMPUTE_SCRIPT_PATH} ."'
                 subprocess.run(compute_command, shell=True, capture_output=True, text=True, cwd=full_path)
-            plot_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {PLOT_SCRIPT_PATH} activation_time.vtu activation_plot.png"'
-            subprocess.run(plot_command, shell=True, capture_output=True, text=True, cwd=full_path)
+            if not os.path.exists(output_png):
+                plot_command = f'bash -c "source /opt/miniforge3/bin/activate pv-env; pvpython {PLOT_SCRIPT_PATH} activation_time.vtu activation_plot.png"'
+                subprocess.run(plot_command, shell=True, capture_output=True, text=True, cwd=full_path)
 
     # --- Stage 3: Assemble the final 4x4 figure ---
     print("\n--- STAGE 3: Assembling final 4x4 figure ---")

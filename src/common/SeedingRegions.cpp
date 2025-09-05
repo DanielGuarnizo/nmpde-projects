@@ -116,8 +116,11 @@ std::unique_ptr<SeedingRegion<DIM>> SeedingRegion<DIM>::create(SeedingRegionType
         corners.push_back(make_pair(Point<2>(70, 42), Point<2>(90, 52)));
         break;
       case SeedingRegionType::AmyloidBeta:   // Example: Two boxes
-        corners.push_back(make_pair(Point<2>(5, 100), Point<2>(70, 120)));
-        corners.push_back(make_pair(Point<2>(100, 70), Point<2>(140, 100)));
+        // corners.push_back(make_pair(Point<2>(5, 100), Point<2>(70, 120)));
+        // corners.push_back(make_pair(Point<2>(100, 70), Point<2>(140, 100)));
+        corners.push_back(make_pair(Point<2>(0, 0), Point<2>(50, 80)));
+        corners.push_back(make_pair(Point<2>(0, 80), Point<2>(90, 115)));
+        corners.push_back(make_pair(Point<2>(90, 0), Point<2>(145, 80)));
         break;
       case SeedingRegionType::Tau:            // Example: A different box
         // corners.push_back(make_pair(Point<2>(90, 60), Point<2>(98, 65)));
@@ -126,7 +129,7 @@ std::unique_ptr<SeedingRegion<DIM>> SeedingRegion<DIM>::create(SeedingRegionType
         break;
       case SeedingRegionType::TDP43:          // Example: Yet another box
         corners.push_back(make_pair(Point<2>(80, 42), Point<2>(90, 47)));
-        corners.push_back(make_pair(Point<2>(63, 90), Point<2>(76, 115)));
+        corners.push_back(make_pair(Point<2>(63, 80), Point<2>(76, 115)));
         break;
       default:
         throw std::invalid_argument("Unknown seeding region type for 2D");
