@@ -1,36 +1,42 @@
-## C++ #########################################################################
-
-# Prerequisites
+## C++ Compilation Artifacts #################################################
 *.d
-
-# Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
-
-# Precompiled Headers
 *.gch
 *.pch
-
-# Compiled Dynamic libraries
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
 *.mod
 *.smod
-
-# Compiled Static libraries
 *.lai
 *.la
 *.a
 *.lib
-
-# Executables
 *.exe
 *.out
 *.app
 
-*/build/*
+## Build & Environment Directories ###########################################
+build/
+.vscode/
+.env
+
+## OS Specific Files #########################################################
+*.DS_Store
+
+## Python Cache ##############################################################
+__pycache__/
+*.pyc
+
+## Simulation Data Files #####################################################
+#
+# This is the definitive fix:
+# Ignore all .vtu and .pvtu files everywhere in the project.
+*.vtu
+*.pvtu
+*.log
+# Also ignore the .problem text files.
+*.problem
